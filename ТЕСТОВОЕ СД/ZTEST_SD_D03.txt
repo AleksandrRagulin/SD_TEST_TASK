@@ -1,0 +1,28 @@
+*&---------------------------------------------------------------------*
+*& Include          ZTEST_SD_D03
+*&---------------------------------------------------------------------*
+CLASS gcl_report DEFINITION.
+  PUBLIC SECTION.
+    METHODS:
+      constructor
+      ,run_report
+      ,show
+      ,excel_download
+      ,action
+      .
+
+    CLASS-METHODS:
+      on_toolbar FOR EVENT toolbar OF cl_gui_alv_grid
+        IMPORTING
+          e_object
+          e_interactive
+          sender.
+
+    CLASS-METHODS:
+      on_user_command FOR EVENT user_command OF cl_gui_alv_grid
+        IMPORTING
+          e_ucomm
+          sender.
+
+
+ENDCLASS.

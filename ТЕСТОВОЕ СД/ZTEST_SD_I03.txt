@@ -1,0 +1,106 @@
+*&---------------------------------------------------------------------*
+*& Include          ZTEST_SD_I03
+*&---------------------------------------------------------------------*
+CLASS gcl_report IMPLEMENTATION.
+  METHOD constructor.
+  ENDMETHOD.
+
+  METHOD run_report.
+    DATA: ls_params TYPE gtys_params.
+
+    ls_params = VALUE #( carrid = s_carrid[]
+                         connid = s_connid[]
+                         cityfrom = s_cityfr[]
+                         cityto = s_cityto[] ).
+
+    go_data = NEW #( is_params = ls_params ).
+    go_alv = NEW #( ).
+    go_data->form_data( ).
+  ENDMETHOD.
+
+  METHOD show.
+    DATA: ltd_data  TYPE gtyt_alv.
+    ltd_data = go_data->get_data( ).
+    go_alv->show( CHANGING ct_data = ltd_data ).
+  ENDMETHOD.
+
+
+  METHOD on_toolbar.
+    CLEAR e_object->mt_toolbar.
+
+    APPEND INITIAL LINE TO e_object->mt_toolbar ASSIGNING FIELD-SYMBOL(<ls_func>).
+    <ls_func>-function = 'EXCEL'.
+    <ls_func>-text = 'Download Excel'.
+
+    APPEND INITIAL LINE TO e_object->mt_toolbar ASSIGNING <ls_func>.
+    <ls_func>-function = 'ACTION'.
+    <ls_func>-text = 'Action'.
+
+    APPEND INITIAL LINE TO e_object->mt_toolbar ASSIGNING <ls_func>.
+    <ls_func>-function = 'EXIT'.
+    <ls_func>-text = 'Exit'.
+  ENDMETHOD.
+
+
+  METHOD excel_download.
+    DATA: ltd_data    TYPE gtyt_alv,
+          lv_filename TYPE string,
+          lv_path     TYPE string,
+          lv_fullpath TYPE string.
+    ltd_data = go_data->get_data( ).
+
+    CALL METHOD cl_gui_frontend_services=>file_save_dialog
+      EXPORTING
+        window_title      = 'Save'
+        file_filter       = 'EXCEL FILES (*.XLS)|*.XLS|EXCEL FILES (*.XLSX)|*.XLSX|'
+        initial_directory = 'C:\'
+      CHANGING
+        filename          = lv_filename
+        path              = lv_path
+        fullpath          = lv_fullpath.
+
+    CHECK lv_fullpath IS NOT INITIAL.
+
+    CALL METHOD cl_gui_frontend_services=>gui_download
+      EXPORTING
+        filename              = lv_fullpath
+        write_field_separator = abap_true
+        append                = 'X'
+      CHANGING
+        data_tab              = ltd_data
+      EXCEPTIONS
+        OTHERS                = 1.
+    IF sy-subrc <> 0.
+      MESSAGE 'somethings gone wrong' TYPE 'I'.
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD action.
+    DATA: ltd_index  TYPE lvc_t_row,
+          lv_message TYPE string.
+    go_alv->mo_alv->get_selected_rows( IMPORTING et_index_rows = ltd_index ).
+
+    IF ltd_index IS INITIAL.
+      MESSAGE 'NO ONE ROW WAS SELECTED!!' TYPE 'I'.
+      RETURN.
+    ENDIF.
+
+    lv_message = |{ lines( ltd_index ) } rows were selected|.
+    MESSAGE lv_message TYPE 'I'.
+
+  ENDMETHOD.
+
+  METHOD on_user_command.
+
+    CASE e_ucomm.
+      WHEN 'EXIT'.
+        LEAVE PROGRAM.
+      WHEN 'EXCEL'.
+        go_report->excel_download( ).
+      WHEN 'ACTION'.
+        go_report->action( ).
+    ENDCASE.
+
+  ENDMETHOD.
+
+ENDCLASS.

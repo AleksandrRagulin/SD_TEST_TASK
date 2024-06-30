@@ -1,0 +1,31 @@
+*&---------------------------------------------------------------------*
+*& Include          ZTEST_SD_I02
+*&---------------------------------------------------------------------*
+CLASS gcl_view IMPLEMENTATION.
+  METHOD show.
+
+    DATA: ls_layout TYPE lvc_s_layo.
+    ls_layout-sel_mode = 'D'.
+
+    cl_salv_table=>factory( IMPORTING r_salv_table = mo_salv
+                            CHANGING  t_table      = ct_data ).
+
+
+    go_container_100 =  NEW #( container_name = 'SCREEN1' ).
+    mo_alv = NEW #( i_parent      = go_container_100
+                    i_appl_events = abap_true ).
+
+    DATA(lt_fcat) = cl_salv_controller_metadata=>get_lvc_fieldcatalog( r_columns      = mo_salv->get_columns( )
+                                                                       r_aggregations = mo_salv->get_aggregations( ) ).
+
+    SET HANDLER gcl_report=>on_toolbar FOR mo_alv.
+    SET HANDLER gcl_report=>on_user_command FOR mo_alv.
+
+    mo_alv->set_table_for_first_display( EXPORTING is_layout       = ls_layout
+                                         CHANGING  it_fieldcatalog = lt_fcat
+                                                   it_outtab       = ct_data ).
+    CALL SCREEN 0100.
+
+  ENDMETHOD.
+
+ENDCLASS.

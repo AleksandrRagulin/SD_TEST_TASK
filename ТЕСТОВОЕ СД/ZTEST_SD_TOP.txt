@@ -1,0 +1,31 @@
+*&---------------------------------------------------------------------*
+*& Include ZTEST_SD_TOP                             - Report ZTEST_SD
+*&---------------------------------------------------------------------*
+TABLES: spfli,
+        icon.
+
+TYPES BEGIN OF gtys_alv.
+INCLUDE TYPE spfli.
+TYPES: lunch_num            TYPE int4,
+       international_flight TYPE char1,
+       airline_rate         TYPE icon_d.
+TYPES END OF gtys_alv.
+
+TYPES: BEGIN OF gtys_params,
+         carrid   TYPE RANGE OF s_carr_id,
+         connid   TYPE RANGE OF s_conn_id,
+         cityfrom TYPE RANGE OF s_from_cit,
+         cityto   TYPE RANGE OF s_to_city,
+       END OF gtys_params.
+
+TYPES: gtyt_alv TYPE STANDARD TABLE OF gtys_alv WITH NON-UNIQUE KEY carrid connid.
+
+CLASS gcl_report DEFINITION DEFERRED.
+CLASS gcl_data DEFINITION DEFERRED.
+CLASS gcl_view DEFINITION DEFERRED.
+
+DATA: go_report TYPE REF TO gcl_report,
+      go_data   TYPE REF TO gcl_data,
+      go_alv    TYPE REF TO gcl_view,
+      go_container_100  TYPE REF TO cl_gui_custom_container
+      .

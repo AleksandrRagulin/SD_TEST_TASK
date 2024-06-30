@@ -1,0 +1,13 @@
+*&---------------------------------------------------------------------*
+*& Include          ZTEST_SD_D02
+*&---------------------------------------------------------------------*
+CLASS gcl_view DEFINITION.
+
+  PUBLIC SECTION.
+    DATA: mo_alv  TYPE REF TO cl_gui_alv_grid,
+          mo_cont TYPE REF TO cl_gui_docking_container,
+          mo_salv TYPE REF TO cl_salv_table.
+    METHODS:
+      show CHANGING ct_data TYPE gtyt_alv.
+
+ENDCLASS.

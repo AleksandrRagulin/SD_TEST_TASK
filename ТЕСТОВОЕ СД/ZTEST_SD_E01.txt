@@ -1,0 +1,11 @@
+*&---------------------------------------------------------------------*
+*& Include          ZTEST_SD_E01
+*&---------------------------------------------------------------------*
+INITIALIZATION.
+  go_report = NEW #( ).
+
+AT SELECTION-SCREEN OUTPUT.
+  go_report->run_report( ).
+
+START-OF-SELECTION.
+  go_report->show( ).

@@ -1,0 +1,59 @@
+*&---------------------------------------------------------------------*
+*& Include          ZTEST_SD_I01
+*&---------------------------------------------------------------------*
+CLASS gcl_data IMPLEMENTATION.
+  METHOD constructor.
+    ms_params = is_params.
+  ENDMETHOD.
+
+  METHOD form_data.
+    form_main_data( ).
+    form_add_data( ).
+  ENDMETHOD.
+
+  METHOD form_main_data.
+    CLEAR: mtd_data.
+
+    SELECT *
+      FROM spfli
+      WHERE carrid IN @ms_params-carrid
+      AND connid IN @ms_params-connid
+      AND cityfrom IN @ms_params-cityfrom
+      AND cityto IN @ms_params-cityto
+      INTO CORRESPONDING FIELDS OF TABLE @mtd_data.
+
+  ENDMETHOD.
+
+  METHOD form_add_data.
+    CONSTANTS: lcov_top_aa1 TYPE s_carr_id VALUE 'AA',
+               lcov_top_aa2 TYPE s_carr_id VALUE 'LH',
+               lcov_bad_aa1 TYPE s_carr_id VALUE 'QF',
+               lcov_bad_aa2 TYPE s_carr_id VALUE 'DL'.
+
+
+    DATA: lv_lunch_num TYPE int4.
+    CHECK mtd_data IS NOT INITIAL.
+
+    LOOP AT mtd_data ASSIGNING FIELD-SYMBOL(<ls_data>).
+      <ls_data>-lunch_num = <ls_data>-fltime / 90.
+
+      IF <ls_data>-countryfr <> <ls_data>-countryto.
+        <ls_data>-international_flight = 'X'.
+      ENDIF.
+
+      IF <ls_data>-carrid = lcov_top_aa1 OR <ls_data>-carrid = lcov_top_aa1.
+        <ls_data>-airline_rate = icon_green_light.
+      ELSEIF <ls_data>-carrid = lcov_bad_aa1 OR <ls_data>-carrid = lcov_bad_aa1.
+        <ls_data>-airline_rate = icon_red_light.
+      ELSE.
+        <ls_data>-airline_rate = icon_yellow_light.
+      ENDIF.
+
+    ENDLOOP.
+
+  ENDMETHOD.
+
+  METHOD get_data.
+    rt_data = mtd_data.
+  ENDMETHOD.
+ENDCLASS.

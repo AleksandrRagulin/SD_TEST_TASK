@@ -1,0 +1,22 @@
+*&---------------------------------------------------------------------*
+*& Include          ZTEST_SD_D01
+*&---------------------------------------------------------------------*
+
+CLASS gcl_data DEFINITION.
+
+  PUBLIC SECTION.
+    METHODS:
+      constructor IMPORTING is_params TYPE gtys_params,
+      form_data,
+      get_data RETURNING VALUE(rt_data) TYPE gtyt_alv.
+
+  PRIVATE SECTION.
+    DATA:
+      mtd_data  TYPE gtyt_alv,
+      ms_params TYPE gtys_params.
+
+    METHODS:
+      form_main_data,
+      form_add_data.
+
+ENDCLASS.
